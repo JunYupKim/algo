@@ -1,0 +1,86 @@
+# Mooyo Mooyo 
+# https://www.acmicpc.net/problem/16768
+import sys
+from collections import deque
+sys.stdin = open("input.txt", 'r')
+
+dx = [-1,1,0,0]
+dy = [0,0,-1,1]
+
+# BFS
+def BFS(x,y,t):
+    global cnt
+    h_loc = [(x,y)]
+    Q = deque()
+    Q.append((x,y))
+    cnt = 1
+    v[x][y] = 1
+    while Q:
+        x,y = Q.popleft()
+        for i in range(4):
+            xx = x + dx[i]
+            yy = y + dy[i]
+            if 0<=xx<n and 0<=yy<10 and v[xx][yy] == 0 and board[xx][yy] == t:
+                v[xx][yy] = 1
+                cnt += 1
+                h_loc.append((xx,yy))
+                Q.append((xx,yy))
+    if cnt >= k:
+        # 연속된 뿌요뿌요 0으로 만들어준다 
+        for x,y in h_loc:
+            board[x][y] = 0
+    return
+
+
+# checks whether there is a blank space between numbers
+def check():
+    for i in range(n):
+        for j in range(10):
+            if board[i][j] == 0:
+                # 위에쪽 체크
+                if 0 <= i-1 < n and board[i-1][j] >= 1:
+                    return True
+    return False
+
+if __name__=='__main__':
+    n,k = map(int,input().split())
+    board = [list(map(int,input())) for _ in range(n)]
+
+    while True:
+        # update the map constantly
+        change = 0
+        for i in range(n):
+            for j in range(10):
+                if board[i][j] > 0:
+                    cnt = 0
+                    v = [[0] * 10 for _ in range(n)]
+                    BFS(i,j,board[i][j])
+                    if cnt >= k:
+                        change = 1
+
+        # 변화가 있다면 update the map ...else break 
+        if change == 1:
+            while check():
+                for j in range(10):
+                    for i in range(n-1,-1,-1):
+                        if board[i][j] == 0:
+                            if 0 <= i-1 < n:
+                                board[i][j] = board[i-1][j]
+                                board[i-1][j] = 0
+        else:
+            break
+
+    for _ in range(n):
+        print(''.join(map(str,board[_])))
+
+
+
+
+
+
+
+
+
+
+
+
